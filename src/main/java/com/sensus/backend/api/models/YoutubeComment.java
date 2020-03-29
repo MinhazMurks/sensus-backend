@@ -21,6 +21,8 @@ public class YoutubeComment {
     @NonNull
     private String commentId;
     @NonNull
+    private String commentText;
+    @NonNull
     private Long likeCount;
     @NonNull
     private String author;
@@ -31,40 +33,44 @@ public class YoutubeComment {
     @NonNull
     private String videoId;
     @NonNull
+    private Boolean isTopLevelComment;
+    @NonNull
     private List<YoutubeComment> replies;
 
-    public static YoutubeComment convertFromCommentThread(CommentThread commentThread) {
+    public static YoutubeComment convertFromCommentThread(CommentThread commentThread, boolean includeReplies) {
         CommentSnippet commentSnippet = commentThread.getSnippet().getTopLevelComment().getSnippet();
 
         YoutubeComment youtubeComment = new YoutubeComment(
                 commentThread.getId(),
+                commentSnippet.getTextOriginal(),
                 commentSnippet.getLikeCount(),
                 commentSnippet.getAuthorDisplayName(),
                 commentSnippet.getAuthorChannelUrl(),
                 commentSnippet.getAuthorProfileImageUrl(),
                 commentSnippet.getVideoId(),
+                true,
                 new ArrayList<YoutubeComment>()
         );
 
-        if(commentThread.getReplies() != null && !commentThread.getReplies().getComments().isEmpty()) {
+        if(commentThread.getReplies() != null && !commentThread.getReplies().getComments().isEmpty() && includeReplies) {
             youtubeComment.setReplies(new ArrayList<YoutubeComment>());
             for(Comment replyComment : commentThread.getReplies().getComments())
             {
                 CommentSnippet replyCommentSnippet = replyComment.getSnippet();
-
                 YoutubeComment reply = new YoutubeComment(
                         replyComment.getId(),
+                        replyCommentSnippet.getTextOriginal(),
                         replyCommentSnippet.getLikeCount(),
                         replyCommentSnippet.getAuthorDisplayName(),
                         replyCommentSnippet.getAuthorChannelUrl(),
                         replyCommentSnippet.getAuthorProfileImageUrl(),
                         replyCommentSnippet.getVideoId(),
+                        false,
                         Collections.emptyList()
                         );
                 youtubeComment.getReplies().add(reply);
             }
         }
-
         return youtubeComment;
     }
 }

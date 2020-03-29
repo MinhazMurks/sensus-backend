@@ -34,3 +34,4 @@ build/
 /sensus-backend.iml
 /.idea/
 /.mvn/
+/src/main/resources/application.properties
